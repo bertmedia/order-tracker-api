@@ -15,14 +15,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 
-const uri = "mongodb://orderUser:0rdeR2021@localhost:27017/burrows-ordertracker";
+const uri = "mongodb+srv://oms-dev:9PHjdFOkMoo45Hoq@cluster0.qjjx8.mongodb.net/burrows-ordertracker?retryWrites=true&w=majority";;
 const SALT = 10;
 //const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 
 app.get('/', (req, res) => {
-  res.send('Hello Worldxx78900!');
+  res.send('Orders Tracker API!');
 });
 
 
@@ -34,7 +34,6 @@ app.listen(port, () => {
       console.log('Connected to Database')
 
       const db = client.db("burrows-ordertracker");
-      //const db = client.db("orderTrackerSys");
       const orderCollection = db.collection("order");
       const productCollection = db.collection("product");
       const userCollection = db.collection("usr");
@@ -50,17 +49,6 @@ app.listen(port, () => {
           response.send(result.result);
         });
 
-      });
-
-      //method to add product
-      app.post("/product", (request, response) => {
-        productCollection.insertOne(request.body, (error, result) => {
-          if (error) {
-            return response.status(500).send(error);
-          }
-
-          response.send(result.result);
-        });
       });
 
       //method to add user
@@ -234,17 +222,6 @@ app.listen(port, () => {
         });
       });
 
-      //method to get all agent accounts by employer
-      app.get("/org/users/:orgId", (request, response) => {
-        userCollection.find({ "orgId": request.params.orgId }).toArray((error, result) => {
-          if (error) {
-            return response.status(500).send(error);
-          }
-
-          response.send(result);
-        });
-      });
-
       //method to get users by id
       app.get("/user/:id", (request, response) => {
         userCollection.findOne({ "_id": new ObjectId(request.params.id) }, (error, result) => {
@@ -342,30 +319,6 @@ app.listen(port, () => {
 
       });
 
-      //method to update product
-      app.put("/product", (request, response) => {
-
-        productCollection.findOneAndUpdate(
-          { "_id": new ObjectId(request.body.id) },
-          {
-            $set: {
-              name: request.body.name,
-              updatedAt: Date.now()
-            }
-          },
-          {
-            upsert: true
-          }
-        )
-          .then(result => {
-            return response.send(result);
-          })
-          .catch(error => {
-            return response.status(500).send(error);
-          });
-
-      });
-
 
       //**********DELETE
       //method to delete users by id
@@ -385,20 +338,6 @@ app.listen(port, () => {
       //method to delete orders by id
       app.delete("/order/:id", (request, response) => {
         orderCollection.findOneAndDelete(
-          { "_id": new ObjectId(request.params.id) }
-        )
-          .then(result => {
-            return response.send(result);
-          })
-          .catch(error => {
-            return response.status(500).send(error);
-          });
-
-      });
-
-      //method to delete products by id
-      app.delete("/product/:id", (request, response) => {
-        productCollection.findOneAndDelete(
           { "_id": new ObjectId(request.params.id) }
         )
           .then(result => {
